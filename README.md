@@ -16,7 +16,7 @@ https://crypto.whoisegor.ru/
 ## 🛠️ Установка
 1. Клонируйте репозиторий:
    ```bash
-   git clone https://github.com/username/cryptoinfo.git
+   git clone https://github.com/shikakker/crypto.git
    cd cryptoinfo
    ```
 2. Установите зависимости:
