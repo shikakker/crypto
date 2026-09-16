@@ -7,9 +7,9 @@ const pkg = JSON.parse(await read('package.json'))
 const api = await read('pages/api/crypto.ts')
 
 test('example uses a stable maintained runtime instead of moving canary/latest tags', () => {
-  assert.equal(pkg.dependencies?.next, '16.3.5')
-  assert.equal(pkg.dependencies?.react, '19.3.0')
-  assert.equal(pkg.dependencies?.['react-dom'], '19.3.0')
+  assert.equal(pkg.dependencies?.next, '15.5.24')
+  assert.equal(pkg.dependencies?.react, '18.2.0')
+  assert.equal(pkg.dependencies?.['react-dom'], '18.2.0')
   assert.equal(pkg.engines?.node, '22.x')
 })
 
@@ -17,6 +17,7 @@ test('demonstration key material is never returned in the API response', () => {
   const responseObject = api.match(/JSON\.stringify\(\{([\s\S]*?)\}\)/)?.[1] ?? ''
   assert.doesNotMatch(responseObject, /\bpassword\s*,/)
   assert.doesNotMatch(responseObject, /password\s*:/)
+  assert.doesNotMatch(responseObject, /demoPassphrase/)
 })
 
 test('edge runtime uses the current non-experimental identifier', () => {
