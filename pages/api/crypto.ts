@@ -1,11 +1,11 @@
 import type { NextRequest } from 'next/server'
 
 // ------------------
-// Using Crypto with Edge Functions
+// Using Web Crypto with an Edge Function
 // ------------------
 
 export const config = {
-  runtime: 'experimental-edge',
+  runtime: 'edge',
 }
 
 export default async function CryptoEdgeAPIRoute(request: NextRequest) {
@@ -13,22 +13,19 @@ export default async function CryptoEdgeAPIRoute(request: NextRequest) {
   const fromMiddleware = url.searchParams.get('token') ?? 'unset'
 
   const plainText = 'Hello from the Edge!'
-  const password = 'hunter2'
+  const demoPassphrase = 'web-crypto-demo-only'
   const ptUtf8 = new TextEncoder().encode(plainText)
-  const pwUtf8 = new TextEncoder().encode(password)
+  const pwUtf8 = new TextEncoder().encode(demoPassphrase)
 
-  // https://developer.mozilla.org/en-US/docs/Web/API/Crypto/subtle
   const pwHash = await crypto.subtle.digest('SHA-256', pwUtf8)
 
-  // Encrypt
   const iv = crypto.getRandomValues(new Uint8Array(12))
-  const alg = { name: 'AES-GCM', iv: iv }
-  const encrpytKey = await crypto.subtle.importKey('raw', pwHash, alg, false, [
+  const alg = { name: 'AES-GCM', iv }
+  const encryptKey = await crypto.subtle.importKey('raw', pwHash, alg, false, [
     'encrypt',
   ])
-  const encrypted = await crypto.subtle.encrypt(alg, encrpytKey, ptUtf8)
+  const encrypted = await crypto.subtle.encrypt(alg, encryptKey, ptUtf8)
 
-  // Decrypt
   const decryptKey = await crypto.subtle.importKey('raw', pwHash, alg, false, [
     'decrypt',
   ])
@@ -37,16 +34,18 @@ export default async function CryptoEdgeAPIRoute(request: NextRequest) {
 
   return new Response(
     JSON.stringify({
-      // https://developer.mozilla.org/en-US/docs/Web/API/Crypto/randomUUID
       uuid: crypto.randomUUID(),
-      // https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues
-      randomValues: crypto.getRandomValues(new Uint32Array(10)),
+      randomValues: Array.from(crypto.getRandomValues(new Uint32Array(10))),
       plainText,
-      password,
       decryptedText,
-      iv,
+      iv: Array.from(iv),
       fromMiddleware,
     }),
-    { headers: { 'Content-Type': 'application/json' } }
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store',
+      },
+    }
   )
 }
