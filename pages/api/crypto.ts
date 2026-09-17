@@ -13,23 +13,18 @@ export default async function CryptoEdgeAPIRoute(request: NextRequest) {
   const fromMiddleware = url.searchParams.get('token') ?? 'unset'
 
   const plainText = 'Hello from the Edge!'
-  const demoPassphrase = 'web-crypto-demo-only'
   const ptUtf8 = new TextEncoder().encode(plainText)
-  const pwUtf8 = new TextEncoder().encode(demoPassphrase)
 
-  const pwHash = await crypto.subtle.digest('SHA-256', pwUtf8)
+  const encryptionKey = await crypto.subtle.generateKey(
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  )
 
   const iv = crypto.getRandomValues(new Uint8Array(12))
   const alg = { name: 'AES-GCM', iv }
-  const encryptKey = await crypto.subtle.importKey('raw', pwHash, alg, false, [
-    'encrypt',
-  ])
-  const encrypted = await crypto.subtle.encrypt(alg, encryptKey, ptUtf8)
-
-  const decryptKey = await crypto.subtle.importKey('raw', pwHash, alg, false, [
-    'decrypt',
-  ])
-  const ptBuffer = await crypto.subtle.decrypt(alg, decryptKey, encrypted)
+  const encrypted = await crypto.subtle.encrypt(alg, encryptionKey, ptUtf8)
+  const ptBuffer = await crypto.subtle.decrypt(alg, encryptionKey, encrypted)
   const decryptedText = new TextDecoder().decode(ptBuffer)
 
   return new Response(
