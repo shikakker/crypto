@@ -5,19 +5,28 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "lint": "next lint",
-    "start": "next start"
+    "lint": "eslint . --max-warnings=0",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
-    "next": "canary",
-    "react": "latest",
-    "react-dom": "latest"
+    "next": "15.5.24",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
-    "@types/node": "^18.0.0",
-    "@types/react": "latest",
-    "eslint": "^8.18.0",
-    "eslint-config-next": "canary",
-    "typescript": "4.7.4"
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.2.79",
+    "@types/react-dom": "^18.2.25",
+    "eslint": "8.57.1",
+    "eslint-config-next": "15.5.24",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "overrides": {
+    "postcss": "8.5.28"
   }
 }
